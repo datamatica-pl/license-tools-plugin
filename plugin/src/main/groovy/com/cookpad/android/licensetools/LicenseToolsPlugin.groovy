@@ -179,7 +179,7 @@ class LicenseToolsPlugin implements Plugin<Project> {
                 libraryInfo.url = libraryInfo.url ?: o.url
             }
             try {
-                content.append(Templates.buildLicenseHtml(libraryInfo));
+                content.append(Templates.buildLicenseHtml(libraryInfo, project.projectDir));
             } catch (NotEnoughInformationException e) {
                 noLicenseLibraries.add(e.libraryInfo)
             }
@@ -193,7 +193,7 @@ class LicenseToolsPlugin implements Plugin<Project> {
         }
 
         project.logger.info("render ${assetsDir}/${ext.outputHtml}")
-        project.file("${assetsDir}/${ext.outputHtml}").write(Templates.wrapWithLayout(content))
+        project.file("${assetsDir}/${ext.outputHtml}").write(Templates.wrapWithLayout(content, project.projectDir))
     }
 
     void generateLicenseJson(Project project) {

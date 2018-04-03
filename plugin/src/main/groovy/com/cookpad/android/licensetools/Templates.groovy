@@ -10,11 +10,18 @@ public class Templates {
 
     static final SimpleTemplateEngine templateEngine = new SimpleTemplateEngine()
 
-    public static String buildLicenseHtml(LibraryInfo library) {
+    public static String buildLicenseHtml(LibraryInfo library, File projectDir) {
         assertLicenseAndStatement(library)
 
-        def templateFile = "template/licenses/${library.normalizedLicense}.html"
-        return templateEngine.createTemplate(readResourceContent(templateFile)).make([
+        def content
+        def templateFile = "template/licenses/${library.license}.html"
+        try {
+            content = readResourceContent(templateFile, projectDir)
+        } catch (FileNotFoundException e) {
+            templateFile = "template/licenses/${library.normalizedLicense}.html"
+            content = readResourceContent(templateFile, projectDir)
+        }
+        return templateEngine.createTemplate(content).make([
                 "library": library
         ])
     }
@@ -28,10 +35,19 @@ public class Templates {
         }
     }
 
-    public static String wrapWithLayout(CharSequence content) {
+    public static String wrapWithLayout(CharSequence content, File projectDir) {
         def templateFile = "template/layout.html"
-        return templateEngine.createTemplate(readResourceContent(templateFile)).make([
-                "content": makeIndent(content, 4)
+        def templateCssFile = "template/layout.css"
+        def templateHeaderFile = "template/header.html"
+        def templateFooterFile = "template/footer.html"
+        def cssContent = readResourceContent(templateCssFile, projectDir)
+        def headerContent = readResourceContent(templateHeaderFile, projectDir)
+        def footerContent = readResourceContent(templateFooterFile, projectDir)
+        return templateEngine.createTemplate(readResourceContent(templateFile, projectDir)).make([
+                "css"    : makeIndent(cssContent, 4),
+                "header": makeIndent(headerContent, 4),
+                "content": makeIndent(content, 4),
+                "footer": makeIndent(footerContent, 4)
         ])
     }
 
@@ -47,12 +63,18 @@ public class Templates {
         return s.toString()
     }
 
-    static String readResourceContent(String filename) {
-        def templateFileUrl = Templates.class.getClassLoader().getResource(filename)
-        if (templateFileUrl == null) {
-            throw new FileNotFoundException("File not found: $filename")
+    static String readResourceContent(String filename, File projectDir) {
+        def templateFileUrl
+        def templateFile = new File(projectDir, filename)
+        if (templateFile.exists()) {
+            templateFileUrl = templateFile.toURI().toURL()
+        } else {
+            templateFileUrl = Templates.class.getClassLoader().getResource(filename)
+            if (templateFileUrl == null) {
+                throw new FileNotFoundException("File not found: $filename")
+            }
+            templateFileUrl = new URL(templateFileUrl.toString())
         }
-        templateFileUrl = new URL(templateFileUrl.toString())
 
         try {
             return templateFileUrl.openStream().getText("UTF-8")

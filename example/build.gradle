@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.cookpad.android.licensetools'
+apply plugin: 'pl.datamatica.licensetools'
 
 repositories {
     google() //required for databinding

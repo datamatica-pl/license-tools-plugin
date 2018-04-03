@@ -30,7 +30,7 @@ final metadata = ext.metadata
 final ARTIFACT_ID = "license-tools-plugin"
 
 // for "plugin:install"
-group = metadata.groupId
+group = 'pl.datamatica.androidcommons'
 jar.baseName = ARTIFACT_ID
 version = metadata.version
 

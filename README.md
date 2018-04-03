@@ -10,18 +10,28 @@ Gradle Plugin to check library licenses and generate license pages.
 
 This plugin requires JDK8 (1.8.0 or later).
 
+First, plugin needs to be installed to local maven repository. This can be done by using command
+```
+gradlew plugin:install
+```
+inside root directory of this repository.
+
+In project level `build.gradle` following changes need to be applied
 ```gradle
 buildscript {
     repositories {
-        jcenter()
+        mavenLocal()
     }
 
     dependencies {
-        classpath 'com.cookpad.android.licensetools:license-tools-plugin:1.2.0'
+        classpath 'pl.datamatica.androidcommons:license-tools-plugin:1.2.0'
     }
 }
+```
 
-apply plugin: 'com.cookpad.android.licensetools'
+and this should go to application `build.gradle`
+```gradle
+apply plugin: 'pl.datamatica.licensetools'
 ```
 
 See [example/build.gradle] for example.
@@ -262,6 +272,7 @@ Keep `CHANGES.md` up-to-date.
 
 ## Copyright and License
 
+Copyright (c) 2016-2017 rockwillj (customizable templates)
 Copyright (c) 2016 Cookpad Inc.
 
 ```
